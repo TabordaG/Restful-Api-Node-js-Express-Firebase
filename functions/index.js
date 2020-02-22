@@ -40,7 +40,7 @@ class Contact {
     }
 }
 
-class Archive {
+class Process {
     constructor(advogado, oab, autor, cep, cidade, comarca, contato, cpf, data, protocolo, uf, vara) {
         this.advogado = advogado,
         this.oab = oab,
@@ -88,9 +88,9 @@ app.post('/contacts', async (req, res) => {
 // })
 
 // Add new Archive
-app.post('/archives', async (req, res) => {
+app.post('/processes', async (req, res) => {
     try {
-        const archives = new Archive();
+        const archives = new Process();
         archives.advogado = req.body['advogado'];
         archives.oab = req.body['oab'];
         archives.autor = req.body['autor'];
@@ -106,12 +106,26 @@ app.post('/archives', async (req, res) => {
 
         const archive = JSON.parse(JSON.stringify(archives));
         const newDoc = await firebaseHelper.firestore
-            .createNewDocument(db, "arquivos", archive);
+            .createNewDocument(db, "processos", archive);
         res.status(201).send(archive);
     } catch (error) {
         var type = typeof archive;
         res.status(400).send(archive)
     }        
+})
+
+app.get('/processes', (req, res) => {
+    firebaseHelper.firestore
+        .backup(db, "processos")
+        .then(data => res.status(200).send(data))
+        .catch(error => res.status(400).send(`Cannot get processes: ${error}`));
+})
+
+app.get('/processes/:processId', (req, res) => {
+    firebaseHelper.firestore
+        .getDocument(db, "processos", req.params.processId)
+        .then(doc => res.status(200).send(doc))
+        .catch(error => res.status(400).send(`Cannot get contact: ${error}`));
 })
 
 // Update new contact
