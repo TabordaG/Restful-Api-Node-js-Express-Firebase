@@ -43,7 +43,7 @@ class Contact {
 }
 
 class Process {
-    constructor(advogado, oab, autor, cep, cidade, comarca, contato, cpf, data, protocolo, uf, vara) {
+    constructor(advogado, oab, autor, cep, cidade, comarca, contato, cpf, data, protocolo, uf, vara, archives, status) {
         this.advogado = advogado,
         this.oab = oab,
         this.autor = autor,
@@ -55,7 +55,9 @@ class Process {
         this.protocolo = protocolo,
         this.uf = uf,
         this.vara = vara,
-        this.cidade = cidade
+        this.cidade = cidade,
+        this.archives = archives,
+        this.status = status
     }
 }
 
@@ -88,6 +90,7 @@ app.post('/processes', async (req, res) => {
         archives.advogado = req.body['advogado'];
         archives.oab = req.body['oab'];
         archives.autor = req.body['autor'];
+        archives.archives = req.body['archives'];
         archives.cep = req.body['cep'];
         archives.cidade = req.body['cidade'];
         archives.comarca = req.body['comarca'];
@@ -97,12 +100,13 @@ app.post('/processes', async (req, res) => {
         archives.protocolo = req.body['protocolo'];
         archives.uf = req.body['uf'];
         archives.vara = req.body['vara'];
+        archives.status = req.body['status'];
 
         const archive = JSON.parse(JSON.stringify(archives));
         // const newDoc = await firebaseHelper.firestore
         //     .createNewDocument(db, "processos", archive);
         // res.status(201).send(newDoc.id);
-        const ref = await db.collection('processes').add(archive);
+        const ref = await db.collection('processos').add(archive);
         res.json({
             id: ref.id,
             archive
