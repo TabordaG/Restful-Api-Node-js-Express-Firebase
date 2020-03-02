@@ -31,12 +31,14 @@ const contactsCollection = 'usuarios';
 exports.main = functions.https.onRequest(main);
 
 class Contact {
-    constructor(email, password, name, office, userid) {
+    constructor(email, password, name, office, userid, processes, pending) {
         this.email = email,
         this.password = password,
         this.name = name,
         this.office = office,
-        this.userid = userid
+        this.userid = userid,
+        this.processes = processes,
+        this.pending = pending
     }
 }
 
@@ -66,6 +68,8 @@ app.post('/contacts', async (req, res) => {
         contact.name = req.body['name'];
         contact.office = req.body['office'];
         contact.userid = req.body['userid'];
+        contact.processes = req.body['processes'];
+        contact.pending = req.body['pending'];
 
         const user = JSON.parse(JSON.stringify(contact));
         const newDoc = await firebaseHelper.firestore
@@ -76,16 +80,6 @@ app.post('/contacts', async (req, res) => {
         res.status(400).send(user)
     }        
 })
-
-// router.post('/upload',upload.single('file'),function(req, res, next) {
-//     console.log(req.file);
-//     if(!req.file) {
-//         res.status(500);
-//         return next(err);
-//     }
-//     res.send(req.file);
-//     //json({ fileUrl: 'http://192.168.0.7:3000/images/' + req.file.filename });
-// })
 
 // Add new Archive
 app.post('/processes', async (req, res) => {
@@ -105,14 +99,35 @@ app.post('/processes', async (req, res) => {
         archives.vara = req.body['vara'];
 
         const archive = JSON.parse(JSON.stringify(archives));
-        const newDoc = await firebaseHelper.firestore
-            .createNewDocument(db, "processos", archive);
-        res.status(201).send(archive);
+        // const newDoc = await firebaseHelper.firestore
+        //     .createNewDocument(db, "processos", archive);
+        // res.status(201).send(newDoc.id);
+        const ref = await db.collection('processes').add(archive);
+        res.json({
+            id: ref.id,
+            archive
+        });
     } catch (error) {
-        var type = typeof archive;
         res.status(400).send(archive)
     }        
 })
+
+// app.post('/processes', async (req, res) => {
+//     try {
+//         const text = req.body.text;
+//         if (!text) throw new Error('Text is blank');
+//         const userid = text["userid"];
+//         delete text["userid"];
+//         const data = { text };
+//         const ref = await db.collection('usuarios').doc(userid).set(data);
+//         res.json({
+//             id: ref.id,
+//             data
+//         });
+//     } catch(e) {
+//         res.send(e);
+//     }
+// });
 
 app.get('/processes', (req, res) => {
     firebaseHelper.firestore
