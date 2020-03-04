@@ -116,22 +116,12 @@ app.post('/processes', async (req, res) => {
     }        
 })
 
-// app.post('/processes', async (req, res) => {
-//     try {
-//         const text = req.body.text;
-//         if (!text) throw new Error('Text is blank');
-//         const userid = text["userid"];
-//         delete text["userid"];
-//         const data = { text };
-//         const ref = await db.collection('usuarios').doc(userid).set(data);
-//         res.json({
-//             id: ref.id,
-//             data
-//         });
-//     } catch(e) {
-//         res.send(e);
-//     }
-// });
+// Delete a contact 
+app.delete('/processes/:processId', async (req, res) => {
+    const deletedContact = await firebaseHelper.firestore
+        .deleteDocument(db, "processos", req.params.contactId);
+    res.status(204).send(`Contact is deleted: ${deletedContact}`);
+})
 
 app.get('/processes', (req, res) => {
     firebaseHelper.firestore
@@ -176,13 +166,6 @@ app.delete('/contacts/:contactId', async (req, res) => {
         .deleteDocument(db, contactsCollection, req.params.contactId);
     res.status(204).send(`Contact is deleted: ${deletedContact}`);
 })
-
-
-
-
-
-
-
 
 // app.get('/get', cors(), async (req, res, next) => {
 //     try {
