@@ -137,6 +137,12 @@ app.get('/processes/:processId', (req, res) => {
         .catch(error => res.status(400).send(`Cannot get contact: ${error}`));
 })
 
+app.patch('/processes/:processId', async (req, res) => {
+    const updatedDoc = await firebaseHelper.firestore
+        .updateDocument(db, "processos", req.params.processId, req.body);
+    res.status(204).send(`Update a new processes: ${updatedDoc}`);
+})
+
 // Update new contact
 app.patch('/contacts/:contactId', async (req, res) => {
     const updatedDoc = await firebaseHelper.firestore
